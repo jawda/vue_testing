@@ -2,7 +2,7 @@
   <div class="question-box-container">
     <b-jumbotron>
       <template slot="lead">
-        {{ currentQuestion.question}}
+        {{ currentQuestion.question | decoder}}
       </template>
       <hr class="my-4" />
 
@@ -13,7 +13,7 @@
             @click="selectAnswer(index)"
             :class="answerClass(index)"
         >
-          {{answer}}
+          {{answer | decoder}}
         </b-list-group-item>
       </b-list-group>
       <b-button
@@ -32,6 +32,7 @@
 </template>
 <script>
 import _ from 'lodash'
+
 export default {
   // variable reference data passed from parent App.vue in this case
   props:{
@@ -70,6 +71,13 @@ export default {
     //   this.selectedIndex = null
     //   this.shuffleAnswers()
     // }
+  },
+  filters: {
+    decoder(str){
+      var textArea = document.createElement("textarea");
+      textArea.innerHTML = str;
+      return textArea.value;
+    }
   },
   methods: {
     //update selected answer on click
