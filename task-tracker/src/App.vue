@@ -32,44 +32,77 @@ export default {
     toggleAddTask(){
       this.showAddTask = !this.showAddTask
     },
-    addTask(task) {
-      this.tasks = [...this.tasks, task]
+    async addTask(task) {
+      //post new task to db.json
+      const res = await fetch('api/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(task)
+      })
+      //wait for response
+      const data = await res.json()
+
+      //update page with what is new data
+      this.tasks = [...this.tasks, data]
     },
-    deleteTask(id){
+    async deleteTask(id){
       // console.log('task', id)
       if(confirm('Are you sure?')){
-        // make a new list where id doesnt match one clicked on
-        this.tasks = this.tasks.filter((task) => task.id !== id )
+
+        //attempt to delete based on id
+        const res = await fetch(`api/tasks/${id}`, {
+          method: 'DELETE'
+        })
+
+        // make a new list where id doesnt match one clicked on if status is delete success
+        res.status === 200 ? (this.tasks = this.tasks.filter((task) => task.id !== id )) :
+            alert('Error deleting task')
+
       }
     },
     // changes the reminder property to the opposite of what it was on double click
-    toggleReminder(id){
+    async toggleReminder(id){
       // console.log(id)
-      this.tasks = this.tasks.map((task) => task.id === id
-        ? {...task, reminder: !task.reminder}: task)
+      //get task from server
+      const taskToToggle = await this.fetchTask(id)
+      //update task and store local
+      const updTask = {...taskToToggle, reminder:!taskToToggle.reminder}
+      //update server
+      const res = await fetch(`api/tasks/${id}`,{
+        method: 'PUT',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(updTask)
+      })
+      //get data back from server
+      const data = await res.json()
+
+      //update page
+      this.tasks = this.tasks.map((task) =>
+          task.id === id ? {...task, reminder: data.reminder} : task)
+    },
+    async fetchTasks(){
+      // get data from local server api is a proxy from config file
+      const res = await fetch('api/tasks')
+      // read as json
+      const data = await res.json()
+
+      return data
+    },
+    async fetchTask(id){
+      // get data from local server
+      const res = await fetch(`api/tasks/${id}`)
+      // read as json
+      const data = await res.json()
+
+      return data
     }
   },
-  created(){
-    this.tasks = [
-    {
-      id: 1,
-      text: "Doctors Appointment",
-      day: 'March 1st at 2:30pm',
-      reminder: true
-    },
-    {
-      id: 2,
-      text: "Meeting at School",
-      day: 'March 3rd at 1:30pm',
-      reminder: true
-    },
-    {
-      id: 3,
-      text: "Food Shopping",
-      day: 'March 3rd at 11:00am',
-      reminder: false
-    }
-  ]
+  async created(){
+    this.tasks = await this.fetchTasks()
   }
 }
 </script>
