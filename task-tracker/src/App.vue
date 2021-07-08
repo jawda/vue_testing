@@ -1,32 +1,52 @@
 <template>
   <div class="container">
-  <Header title="Task Tracker"/>
-  <Tasks @delete-task="deleteTask" :tasks="tasks"/>
+  <Header @toggle-add-task="toggleAddTask" title="Task Tracker"
+    :showAddTask="showAddTask" />
+    <div v-show="showAddTask">
+
+      <AddTask @add-task="addTask" />
+    </div>
+  <Tasks @toggle-reminder="toggleReminder" @delete-task="deleteTask" :tasks="tasks"/>
   </div>
 </template>
 
 <script>
 import Header from './components/Header'
 import Tasks from "@/components/Tasks";
+import AddTask from "@/components/AddTask";
 
 export default {
   name: 'App',
   components: {
     Header,
-    Tasks
+    Tasks,
+    AddTask
   },
   data() {
     return {
-      tasks: []
+      tasks: [],
+      showAddTask: false
     }
   },
   methods: {
+    toggleAddTask(){
+      this.showAddTask = !this.showAddTask
+    },
+    addTask(task) {
+      this.tasks = [...this.tasks, task]
+    },
     deleteTask(id){
       // console.log('task', id)
       if(confirm('Are you sure?')){
         // make a new list where id doesnt match one clicked on
         this.tasks = this.tasks.filter((task) => task.id !== id )
       }
+    },
+    // changes the reminder property to the opposite of what it was on double click
+    toggleReminder(id){
+      // console.log(id)
+      this.tasks = this.tasks.map((task) => task.id === id
+        ? {...task, reminder: !task.reminder}: task)
     }
   },
   created(){
