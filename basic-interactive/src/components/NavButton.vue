@@ -21,12 +21,22 @@ export default {
 
 <style scoped>
 .arrow{
-  //height: 100px;
-  //width: 100px;
   max-width: 70%;
   height: auto;
   width: auto\9; /* ie8 */
   cursor: pointer;
+  //opacity: 1;
+  //-webkit-filter: brightness(100%);
+  //-webkit-transition: .3s ease-in-out;
+  //transition: .3s ease-in-out;
+}
+.arrow:hover{
+  //box-shadow: 0 5px #666;
+  //opacity: .9;
+  //-webkit-filter: brightness(80%);
+}
+.arrow:active{
+  transform: scaleY(0.98) scaleX(0.98);
 }
 
 </style>

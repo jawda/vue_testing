@@ -1,7 +1,5 @@
 <template>
 <div class="imgbox">
-<!--  <img :src="path" >-->
-
   <img :src="path" class="center-fit" alt="slide">
 </div>
 </template>
